@@ -1,3 +1,8 @@
+import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.layout.*;
+
+import java.awt.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -16,20 +21,22 @@ public class Dice {
     public enum ColorsInGame {
         RED, BLUE, PURPLE, YELLOW, GREEN;
 
-        ColorsInGame(){ }
+        ColorsInGame() {
+        }
 
         private static final List<ColorsInGame> VALUES =
                 Collections.unmodifiableList(Arrays.asList(values()));
         private static final int SIZE = VALUES.size();
         private static final Random RANDOM = new Random();
 
-        public static ColorsInGame randomColor()  {
+        public static ColorsInGame randomColor() {
             return VALUES.get(RANDOM.nextInt(SIZE));
         }
     }
 
     // constructors
-    public Dice() { }
+    public Dice() {
+    }
 
     public Dice(int number, ColorsInGame colorsInGame) {
         this.number = number;
@@ -57,9 +64,13 @@ public class Dice {
     }
 
     // getters
-    public int getNumber() { return number; }
+    public int getNumber() {
+        return number;
+    }
 
-    public ColorsInGame getColor() { return colorsInGame; }
+    public ColorsInGame getColor() {
+        return colorsInGame;
+    }
 
     public int getRedNr() {
         return redNr;
@@ -73,7 +84,9 @@ public class Dice {
         return purpleNr;
     }
 
-    public int getYellowNr() { return yellowNr; }
+    public int getYellowNr() {
+        return yellowNr;
+    }
 
     public int getGreenNr() {
         return greenNr;
@@ -93,10 +106,24 @@ public class Dice {
     }
 
     // show one dice with its properties
-    public void showDice(){
+    public void showDice() {
         System.out.println("Color: " + this.colorsInGame + "\n" +
                 "Number: " + this.getNumber());
 
+    }
+
+    public Button loadDice() {
+        Image image;
+        String path = ("file:///C:\\Sagrada\\Sagrada\\src\\main\\resources\\" + this.colorsInGame + "\\" + this.colorsInGame.toString().toLowerCase() + "_" + this.number + ".png");
+        image = new Image(path);
+
+        Button button = new Button();
+        button.setPrefSize(72, 72);
+        button.setStyle("-fx-border-color: black;" +
+                "-fx-border-width: 3");
+        button.setBackground(new Background(new BackgroundImage(image, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
+
+        return button;
     }
 
 
