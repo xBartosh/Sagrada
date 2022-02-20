@@ -113,14 +113,14 @@ public class Dice {
     }
 
     public Button loadDice() {
+
         Image image;
-        String path = ("file:///C:\\Sagrada\\Sagrada\\src\\main\\resources\\" + this.colorsInGame + "\\" + this.colorsInGame.toString().toLowerCase() + "_" + this.number + ".png");
+        String userDirectory = System.getProperty("user.dir");
+        String path = ("file:///" + userDirectory + "\\src\\main\\resources\\" + this.colorsInGame + "\\" + this.colorsInGame.toString().toLowerCase() + "_" + this.number + ".png");
         image = new Image(path);
 
         Button button = new Button();
         button.setPrefSize(72, 72);
-        button.setStyle("-fx-border-color: black;" +
-                "-fx-border-width: 3");
         button.setBackground(new Background(new BackgroundImage(image, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
 
         return button;
