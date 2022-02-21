@@ -8,6 +8,8 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -15,7 +17,9 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import java.io.*;
+import javax.swing.*;
+import java.util.Optional;
+import java.util.Random;
 
 public class Sagrada extends Application {
     // Launch app
@@ -25,6 +29,17 @@ public class Sagrada extends Application {
 
     static int counter;
     static int roundCounter;
+    static int favorTokens;
+    static Color mainColor;
+    static int windowCounter = 0;
+    GridPane gridPaneFinal;
+    HBox hBoxFinal;
+    boolean isChosen;
+    WindowFrameBoard windowFrameBoardDefault = new WindowFrameBoard();
+    WindowFrameBoard[] windowFrameBoards = new WindowFrameBoard[4];
+    WindowFrameBoard windowFrameBoardFinal = new WindowFrameBoard();
+    String userDirectory = System.getProperty("user.dir");
+
 
     //
     public static Dice rollDices() {
@@ -59,14 +74,19 @@ public class Sagrada extends Application {
         Dice.ColorsInGame colorsInGame = Dice.ColorsInGame.randomColor();
 
         if (colorsInGame.equals(Dice.ColorsInGame.RED)) {
+            mainColor = Color.RED;
             return Color.RED;
         } else if (colorsInGame.equals(Dice.ColorsInGame.BLUE)) {
+            mainColor = Color.BLUE;
             return Color.BLUE;
         } else if (colorsInGame.equals(Dice.ColorsInGame.PURPLE)) {
+            mainColor = Color.PURPLE;
             return Color.PURPLE;
         } else if (colorsInGame.equals(Dice.ColorsInGame.YELLOW)) {
+            mainColor = Color.YELLOW;
             return Color.YELLOW;
         } else if (colorsInGame.equals(Dice.ColorsInGame.GREEN)) {
+            mainColor = Color.GREEN;
             return Color.GREEN;
         } else {
             System.out.println("ERROR");
@@ -84,94 +104,50 @@ public class Sagrada extends Application {
         return random;
     }
 
-    // Load the board from file
-    public static void loadBoard(GridPane gridPane, String fileName, Button[][] buttons) {
-        try {
-            String line = new String();
-            String userDirectory = System.getProperty("user.dir");
-            File file = new File(userDirectory + "\\src\\main\\resources\\" + fileName);
-            FileReader fileReader = new FileReader(file);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            int i = 0;
-
-            while ((line = bufferedReader.readLine()) != null) {
-                for (int j = 0; j < 5; j++) {
-                    if (line != null) {
-                        switch (line.charAt(j)) {
-                            case '1':
-                                buttons[i][j].setBackground(new Background(new BackgroundImage(new Image("DEFAULT/d_1.png"), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
-                                break;
-                            case '2':
-                                buttons[i][j].setBackground(new Background(new BackgroundImage(new Image("DEFAULT/d_2.png"), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
-                                break;
-                            case '3':
-                                buttons[i][j].setBackground(new Background(new BackgroundImage(new Image("DEFAULT/d_3.png"), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
-                                break;
-                            case '4':
-                                buttons[i][j].setBackground(new Background(new BackgroundImage(new Image("DEFAULT/d_4.png"), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
-                                break;
-                            case '5':
-                                buttons[i][j].setBackground(new Background(new BackgroundImage(new Image("DEFAULT/d_5.png"), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
-                                break;
-                            case '6':
-                                buttons[i][j].setBackground(new Background(new BackgroundImage(new Image("DEFAULT/d_6.png"), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
-                                break;
-                            case 'W':
-                                buttons[i][j].setBackground(new Background(new BackgroundImage(new Image("DEFAULT/d.png"), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
-                                break;
-                            case 'R':
-                                buttons[i][j].setBackground(new Background(new BackgroundImage(new Image("RED/red.png"), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
-                                break;
-                            case 'B':
-                                buttons[i][j].setBackground(new Background(new BackgroundImage(new Image("BLUE/blue.png"), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
-                                break;
-                            case 'Y':
-                                buttons[i][j].setBackground(new Background(new BackgroundImage(new Image("YELLOW/yellow.png"), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
-                                break;
-                            case 'G':
-                                buttons[i][j].setBackground(new Background(new BackgroundImage(new Image("GREEN/green.png"), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
-                                break;
-                            case 'P':
-                                buttons[i][j].setBackground(new Background(new BackgroundImage(new Image("PURPLE/purple.png"), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
-                                break;
-                            default:
-                                System.out.println("error");
-                                break;
-
-                        }
-
-                    }
-                }
-                i++;
-            }
-
-        } catch (IOException e) {
-            System.out.println("ERROR");
-        }
-
-
-    }
 
     @Override
     public void start(Stage primaryStage) {
 
-
-        //Images
-        Image[] image = new Image[5];
-        ImageView[] imageView = new ImageView[5];
-
-        for (int i = 0; i < 5; i++) {
-            image[i] = new Image("cut-diamond.png");
-            imageView[i] = new ImageView(image[i]);
-        }
-
         // Buttons
+
         // for board
         Button[][] buttons = new Button[4][5];
 
         // for color spinning
         Button spinColorButton = new Button("Wylosuj kolor");
-        spinColorButton.setPrefSize(100, 10);
+        spinColorButton.setPrefHeight(10);
+
+        // for window spinning
+        Button windowButton = new Button("Wylosuj karty wzorow");
+        windowButton.setPrefHeight(10);
+        windowButton.setDisable(true);
+        windowButton.setVisible(false);
+
+        // confirm for window
+        Button confirmWindowButton = new Button();
+        confirmWindowButton.setBackground(new Background(new BackgroundImage(new Image("file:///" + userDirectory + "\\src\\main\\resources\\" + "confirm.png"), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
+        confirmWindowButton.setPrefSize(30, 30);
+        confirmWindowButton.setStyle("-fx-border-color: black;");
+        confirmWindowButton.setVisible(false);
+
+        // arrows for windows
+        Button arrowR = new Button();
+        arrowR.setPrefSize(30, 30);
+        arrowR.setLayoutY(608);
+        arrowR.setLayoutX(429);
+        arrowR.setStyle("-fx-border-color: black;" +
+                "-fx-border-width: 2;");
+        arrowR.setBackground(new Background(new BackgroundImage(new Image("file:///" + userDirectory + "\\src\\main\\resources\\" + "arrowR.png"), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
+        arrowR.setVisible(false);
+
+        Button arrowL = new Button();
+        arrowL.setPrefSize(30, 30);
+        arrowL.setLayoutY(608);
+        arrowL.setLayoutX(22);
+        arrowL.setStyle("-fx-border-color: black;" +
+                "-fx-border-width: 2;");
+        arrowL.setBackground(new Background(new BackgroundImage(new Image("file:///" + userDirectory + "\\src\\main\\resources\\" + "arrowL.png"), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
+        arrowL.setVisible(false);
 
         // for color
         Button colorButton = new Button();
@@ -180,21 +156,54 @@ public class Sagrada extends Application {
         colorButton.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
 
         // for spinning dices
+        HBox spinDicesHBox = new HBox();
+        spinDicesHBox.setAlignment(Pos.BOTTOM_CENTER);
         Button spinDicesButton = new Button("Start");
         spinDicesButton.setLayoutX(50);
         spinDicesButton.setLayoutY(150);
+        spinDicesHBox.getChildren().add(spinDicesButton);
 
         // HBox round track, above gridPane and another HBox
         HBox roundTrack = new HBox();
+        roundTrack.setPrefWidth(884);
+        roundTrack.setMaxHeight(100);
         roundTrack.setSpacing(10);
+        roundTrack.setLayoutY(10);
+        roundTrack.setAlignment(Pos.CENTER);
+        roundTrack.setPadding(new Insets(10, 0, 10, 0));
+        roundTrack.setStyle("-fx-border-color: black;" +
+                "-fx-border-width: 2;"+
+                "-fx-background-color: #ffdbb7;");
+        roundTrack.setLayoutX(50);
         Button[] buttonsForRounds = new Button[10];
         String userDirectory = System.getProperty("user.dir");
         for (int i = 0; i < 10; i++) {
             buttonsForRounds[i] = new Button();
             buttonsForRounds[i].setPrefSize(75, 75);
-            buttonsForRounds[i].setBackground(new Background(new BackgroundImage(new Image("file:///" + userDirectory + "\\src\\main\\resources\\" + "NUMBERS/" + (i+1)+".png"), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
+            buttonsForRounds[i].setBackground(new Background(new BackgroundImage(new Image("file:///" + userDirectory + "\\src\\main\\resources\\" + "NUMBERS/" + (i + 1) + ".png"), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
             roundTrack.getChildren().add(buttonsForRounds[i]);
         }
+
+        // HBox for the start of the game
+        HBox hBoxButtons = new HBox();
+        hBoxButtons.setSpacing(10);
+
+        // VBox, first part of the HBox
+        VBox vBoxColor = new VBox();
+        vBoxColor.getChildren().add(spinColorButton);
+        vBoxColor.getChildren().add(colorButton);
+        vBoxColor.setSpacing(7);
+        vBoxColor.setAlignment(Pos.CENTER);
+        hBoxButtons.getChildren().add(vBoxColor);
+
+        // VBox, second part of the HBox
+        VBox vBoxWindows = new VBox();
+        vBoxWindows.getChildren().add(windowButton);
+        vBoxWindows.getChildren().add(confirmWindowButton);
+        vBoxWindows.setAlignment(Pos.CENTER);
+        vBoxWindows.setSpacing(7);
+        hBoxButtons.getChildren().add(vBoxWindows);
+
 
         // HBox above GridPane
         HBox hBoxA = new HBox();
@@ -205,57 +214,27 @@ public class Sagrada extends Application {
         hBoxA.setAlignment(Pos.CENTER);
         hBoxA.setMaxWidth(381);
 
-        // Region for trick
-        Region region1 = new Region();
-        HBox.setHgrow(region1, Priority.ALWAYS);
-
-        // HBox under GridPane
-        HBox hBox = new HBox();
-        hBox.setStyle("-fx-border-width: 3;" +
-                "-fx-border-color: black;");
-        hBox.setPadding(new Insets(10, 20, 10, 20));
-        hBox.setAlignment(Pos.CENTER_LEFT);
-        hBox.getChildren().addAll(colorButton, region1, imageView[0], imageView[1], imageView[2], imageView[3], imageView[4]);
-        hBox.setSpacing(10);
-        hBox.setMaxWidth(381);
-
-        // GridPane
-        GridPane gridPane = new GridPane();
-        gridPane.setMaxWidth(381);
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 5; j++) {
-                buttons[i][j] = new Button();
-                gridPane.add(buttons[i][j], j, i);
-                buttons[i][j].setPrefSize(75, 75);
-                buttons[i][j].setStyle("-fx-border-color: black;" +
-                        "-fx-border-width: 3;");
-            }
-        }
-        gridPane.setHgap(0.49);
-        gridPane.setVgap(0.49);
-        gridPane.setStyle("-fx-border-color: black;" +
-                "-fx-border-width: 3");
-
-        loadBoard(gridPane, "board_1.txt", buttons);
 
         // VBox
         VBox vBox = new VBox();
         vBox.setLayoutX(50);
-        vBox.setLayoutY(100);
-        vBox.getChildren().add(roundTrack);
-        vBox.getChildren().add(spinDicesButton);
+        vBox.setLayoutY(150);
+        vBox.getChildren().add(hBoxButtons);
         vBox.getChildren().add(hBoxA);
-        vBox.getChildren().add(gridPane);
-        vBox.getChildren().add(hBox);
-        vBox.getChildren().add(spinColorButton);
+        vBox.getChildren().add(windowFrameBoardDefault.getGridPane());
+        vBox.getChildren().add(windowFrameBoardDefault.gethBox());
         vBox.setSpacing(10);
 
         // Layout
         Group group = new Group();
+        group.getChildren().add(roundTrack);
         group.getChildren().add(vBox);
+        group.getChildren().add(arrowR);
+        group.getChildren().add(arrowL);
 
         // Scene
         Scene scene = new Scene(group);
+        scene.setFill(Color.web("#d2a887"));
 
         // Stage
         primaryStage.setScene(scene);
@@ -266,14 +245,6 @@ public class Sagrada extends Application {
         primaryStage.show();
 
         // Listeners
-        spinColorButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                colorButton.setBackground(new Background(new BackgroundFill(spinColor(), CornerRadii.EMPTY, Insets.EMPTY)));
-                spinColorButton.setVisible(false);
-            }
-        });
-
 
         EventHandler mouseEn = new EventHandler<MouseEvent>() {
             @Override
@@ -288,23 +259,139 @@ public class Sagrada extends Application {
             }
         };
 
+        // Color spinning
+        spinColorButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                mainColor = spinColor();
+                colorButton.setBackground(new Background(new BackgroundFill(mainColor, CornerRadii.EMPTY, Insets.EMPTY)));
+                spinColorButton.setVisible(false);
+                windowButton.setDisable(false);
+                windowButton.setVisible(true);
+            }
+        });
+
+        // Window Frames spinning
+        windowButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                Random random = new Random();
+                int num1 = random.nextInt(12) + 1;
+                int num2 = random.nextInt(12) + 1;
+                while (num2 == num1) {
+                    num2 = random.nextInt(12) + 1;
+                }
+                System.out.println("Pierwsza: " + num1);
+                System.out.println("Druga: " + num2);
+                windowFrameBoards[0] = new WindowFrameBoard(num1 + "_" + "1.txt", mainColor);
+                windowFrameBoards[1] = new WindowFrameBoard(num1 + "_" + "2.txt", mainColor);
+                windowFrameBoards[2] = new WindowFrameBoard(num2 + "_" + "1.txt", mainColor);
+                windowFrameBoards[3] = new WindowFrameBoard(num2 + "_" + "2.txt", mainColor);
+
+
+                vBox.getChildren().remove(2);
+                vBox.getChildren().remove(2);
+                vBox.getChildren().add(windowFrameBoards[0].getGridPane());
+                vBox.getChildren().add(windowFrameBoards[0].gethBox());
+                windowButton.setDisable(true);
+                arrowR.setVisible(true);
+                arrowL.setVisible(true);
+                confirmWindowButton.setVisible(true);
+            }
+        });
+
+
+        // Confirm window button
+        confirmWindowButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+
+                confirmWindowButton.setDisable(true);
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Wybor wzoru witrazu");
+                alert.setHeaderText("Czy na pewno chcesz wybrac te karte wzorow?");
+                alert.setContentText("");
+
+                ButtonType buttonYes = new ButtonType("Tak");
+                ButtonType buttonNo = new ButtonType("Nie");
+                alert.getButtonTypes().setAll(buttonYes, buttonNo);
+                Optional<ButtonType> result = alert.showAndWait();
+
+                if (result.get() == buttonYes) {
+                    windowFrameBoardFinal = windowFrameBoards[windowCounter];
+                    vBox.getChildren().remove(2);
+                    vBox.getChildren().remove(2);
+                    vBox.getChildren().addAll(windowFrameBoardFinal.getGridPane(), windowFrameBoardFinal.gethBox());
+                    spinDicesHBox.setPrefHeight(hBoxButtons.getHeight());
+                    spinDicesHBox.setPrefWidth(hBoxA.getWidth());
+                    vBox.getChildren().remove(hBoxButtons);
+                    arrowR.setVisible(false);
+                    arrowL.setVisible(false);
+                    vBox.getChildren().add(0, spinDicesHBox);
+                } else if(result.get() == buttonNo){
+                    confirmWindowButton.setDisable(false);
+                }
+            }
+
+
+        });
+
+        // Arrows for windows
+        arrowR.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                windowCounter++;
+                vBox.getChildren().remove(2);
+                vBox.getChildren().remove(2);
+                if (windowCounter == 4) {
+                    windowCounter = 0;
+                    vBox.getChildren().add(windowFrameBoards[windowCounter].getGridPane());
+                    vBox.getChildren().add(windowFrameBoards[windowCounter].gethBox());
+                } else {
+                    vBox.getChildren().add(windowFrameBoards[windowCounter].getGridPane());
+                    vBox.getChildren().add(windowFrameBoards[windowCounter].gethBox());
+                }
+
+            }
+        });
+
+        arrowL.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                windowCounter--;
+                vBox.getChildren().remove(2);
+                vBox.getChildren().remove(2);
+                if (windowCounter == -1) {
+                    windowCounter = 3;
+                    vBox.getChildren().add(windowFrameBoards[windowCounter].getGridPane());
+                    vBox.getChildren().add(windowFrameBoards[windowCounter].gethBox());
+                } else {
+                    vBox.getChildren().add(windowFrameBoards[windowCounter].getGridPane());
+                    vBox.getChildren().add(windowFrameBoards[windowCounter].gethBox());
+                }
+
+            }
+        });
+
+
+        // Roll the dices button on click
         spinDicesButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 Dice dices = new Dice();
-                if (dices.getAllDicesNr() > 0) {
+                if (dices.getAllDicesNr() > 0 && roundCounter < 10) {
                     if (counter % 3 == 0 && counter != 0) {
                         hBoxA.getChildren().remove(0, 3);
                         for (int i = 0; i < 3; i++) {
                             Dice dice = rollDices();
-                            hBoxA.getChildren().add(dice.loadDice());
+                            hBoxA.getChildren().add(dice.getButton());
                             hBoxA.getChildren().get(i).setOnMouseEntered(mouseEn);
                             hBoxA.getChildren().get(i).setOnMouseExited(mouseEx);
                         }
                     } else if (counter == 0) {
                         for (int i = 0; i < 3; i++) {
                             Dice dice = rollDices();
-                            hBoxA.getChildren().add(dice.loadDice());
+                            hBoxA.getChildren().add(dice.getButton());
                             hBoxA.getChildren().get(i).setOnMouseEntered(mouseEn);
                             hBoxA.getChildren().get(i).setOnMouseExited(mouseEx);
                         }
@@ -322,24 +409,24 @@ public class Sagrada extends Application {
                     spinDicesButton.setVisible(false);
                     dices.showAllDices();
                 }
-
-
             }
 
         });
 
 
+        arrowR.setOnMouseEntered(mouseEn);
+        arrowR.setOnMouseExited(mouseEx);
+        arrowL.setOnMouseEntered(mouseEn);
+        arrowL.setOnMouseExited(mouseEx);
         spinDicesButton.setOnMouseEntered(mouseEn);
         spinDicesButton.setOnMouseExited(mouseEx);
         spinColorButton.setOnMouseEntered(mouseEn);
         spinColorButton.setOnMouseExited(mouseEx);
-
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 5; j++) {
-                buttons[i][j].setOnMouseEntered(mouseEn);
-                buttons[i][j].setOnMouseExited(mouseEx);
-            }
-        }
+        windowButton.setOnMouseEntered(mouseEn);
+        windowButton.setOnMouseExited(mouseEx);
+        confirmWindowButton.setOnMouseEntered(mouseEn);
+        confirmWindowButton.setOnMouseExited(mouseEx);
 
     }
+
 }

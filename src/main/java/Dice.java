@@ -16,6 +16,7 @@ public class Dice {
     private static int greenNr = 18;
     private int number;
     private ColorsInGame colorsInGame;
+    private Button button;
 
     // colors
     public enum ColorsInGame {
@@ -36,11 +37,22 @@ public class Dice {
 
     // constructors
     public Dice() {
+        this.button = new Button();
     }
 
     public Dice(int number, ColorsInGame colorsInGame) {
         this.number = number;
         this.colorsInGame = colorsInGame;
+        this.button = new Button();
+
+        Image image;
+        String userDirectory = System.getProperty("user.dir");
+        String path = ("file:///" + userDirectory + "\\src\\main\\resources\\" + this.colorsInGame + "\\" + this.colorsInGame.toString().toLowerCase() + "_" + this.number + ".png");
+        image = new Image(path);
+
+        this.button.setPrefSize(72, 72);
+        this.button.setBackground(new Background(new BackgroundImage(image, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
+
         switch (colorsInGame) {
             case RED:
                 this.redNr -= 1;
@@ -61,6 +73,7 @@ public class Dice {
                 System.out.println("Error");
                 break;
         }
+
     }
 
     // getters
@@ -112,18 +125,8 @@ public class Dice {
 
     }
 
-    public Button loadDice() {
-
-        Image image;
-        String userDirectory = System.getProperty("user.dir");
-        String path = ("file:///" + userDirectory + "\\src\\main\\resources\\" + this.colorsInGame + "\\" + this.colorsInGame.toString().toLowerCase() + "_" + this.number + ".png");
-        image = new Image(path);
-
-        Button button = new Button();
-        button.setPrefSize(72, 72);
-        button.setBackground(new Background(new BackgroundImage(image, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
-
-        return button;
+    public Button getButton() {
+        return this.button;
     }
 
 
